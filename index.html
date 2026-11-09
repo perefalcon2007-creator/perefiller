@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#F3E7CC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Perefiller">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,9 +15,15 @@
 <title>Perefiller</title>
 <style>
 :root{
-  --bg:#1E140A; --surface:#2A1E12; --surface-2:#362819;
-  --line:rgba(255,226,180,.10); --text:#F6EDDC; --muted:#B5A385;
-  --accent:#E9A94A; --accent-hi:#F6CD84; --glow:rgba(233,169,74,.38);
+  --paper:#F3E7CC;        /* parchment page */
+  --paper-hi:#FBF4E1;     /* lighter parchment for cards */
+  --paper-lo:#E6D3A8;     /* aged edge */
+  --ink:#2B1D0E;          /* iron-gall ink */
+  --ink-soft:#6B5536;     /* faded ink */
+  --line:rgba(74,50,22,.18);
+  --accent:#7A2E1E;       /* wax seal red */
+  --accent-hi:#9C3F2B;
+  --glow:rgba(122,46,30,.28);
   --radius:18px;
   --serif:'Fraunces',Georgia,'Times New Roman',serif;
   --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -25,11 +31,12 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{
-  font-family:var(--sans);color:var(--text);
+  font-family:var(--sans);color:var(--ink);
   background:
-    radial-gradient(900px 500px at 85% -10%, rgba(233,169,74,.18), transparent 60%),
-    radial-gradient(700px 500px at -10% 110%, rgba(246,205,132,.08), transparent 60%),
-    var(--bg);
+    radial-gradient(1100px 600px at 50% -15%, #FBF4E1 0%, transparent 62%),
+    radial-gradient(900px 600px at 50% 120%, rgba(122,89,40,.14), transparent 60%),
+    linear-gradient(180deg,var(--paper),var(--paper-lo));
+  background-attachment:fixed;
   display:flex;flex-direction:column;height:100dvh;overflow:hidden;
   -webkit-font-smoothing:antialiased;
 }
@@ -37,22 +44,22 @@ body{
 /* ---------- Header ---------- */
 header{
   display:flex;align-items:center;gap:8px;padding:12px 14px;
-  background:rgba(30,20,10,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(251,244,225,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);position:relative;z-index:5;
 }
 .brand{font-family:var(--serif);font-style:italic;font-size:21px;letter-spacing:.2px;margin-right:auto;white-space:nowrap}
 .brand span{color:var(--accent)}
 .btn{
   display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;
-  border:1px solid var(--line);background:var(--surface);color:var(--text);
+  border:1px solid var(--line);background:var(--paper-hi);color:var(--ink);
   font:500 13px var(--sans);cursor:pointer;transition:transform .15s,background .2s,box-shadow .2s;
   white-space:nowrap;
 }
-.btn:hover{background:var(--surface-2)}
+.btn:hover{background:#fff8e8}
 .btn:active{transform:scale(.96)}
 .btn:disabled{opacity:.4;cursor:default}
 .btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
-.btn.primary{background:var(--accent);color:#1E140A;border-color:transparent;box-shadow:0 8px 22px -8px var(--glow)}
+.btn.primary{background:var(--accent);color:var(--paper-hi);border-color:transparent;box-shadow:0 8px 22px -8px var(--glow)}
 .btn.primary:hover{background:var(--accent-hi)}
 @media (max-width:520px){ .btn .lbl{display:none} .btn{padding:9px 11px} }
 
@@ -63,8 +70,8 @@ header{
   -webkit-overflow-scrolling:touch;
 }
 .page{
-  position:relative;border-radius:6px;overflow:hidden;background:#fff;flex:0 0 auto;
-  box-shadow:0 26px 60px -18px rgba(0,0,0,.7),0 0 0 1px rgba(255,226,180,.07);
+  position:relative;border-radius:3px;overflow:hidden;background:#fff;flex:0 0 auto;
+  box-shadow:0 22px 44px -18px rgba(60,40,15,.45),0 0 0 1px rgba(74,50,22,.12);
   animation:rise .55s cubic-bezier(.2,.7,.2,1) both;
 }
 .page canvas{display:block}
@@ -74,7 +81,7 @@ body.drag .overlay{touch-action:none}
 
 /* ---------- Annotations ---------- */
 .annot{position:absolute;transition:box-shadow .2s}
-.annot.sel{outline:2px solid var(--accent);outline-offset:3px;box-shadow:0 0 0 6px rgba(233,169,74,.16);border-radius:3px}
+.annot.sel{outline:2px solid var(--accent);outline-offset:3px;box-shadow:0 0 0 6px rgba(122,46,30,.14);border-radius:3px}
 .annot img,.annot svg{width:100%;height:100%;display:block;pointer-events:none}
 .annot.text,.annot.date{white-space:nowrap;font-family:Helvetica,Arial,sans-serif}
 
@@ -83,57 +90,57 @@ body.drag .overlay{touch-action:none}
 .eyebrow{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:600}
 .empty h1{font-family:var(--serif);font-weight:400;font-size:46px;line-height:1.02;letter-spacing:-.8px;margin:14px 0 12px}
 .empty h1 em{color:var(--accent);font-style:italic}
-.empty p{color:var(--muted);line-height:1.6;margin:0 0 26px;font-size:15px}
+.empty p{color:var(--ink-soft);line-height:1.6;margin:0 0 26px;font-size:15px}
 .drop{
   display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;padding:36px 20px;
-  border:1.5px dashed rgba(233,169,74,.42);border-radius:var(--radius);
-  background:linear-gradient(180deg,rgba(255,226,180,.05),rgba(255,226,180,.01));
-  color:var(--text);font:500 15px var(--sans);cursor:pointer;transition:border-color .25s,background .25s,transform .2s;
+  border:1.5px dashed rgba(122,46,30,.45);border-radius:var(--radius);
+  background:rgba(251,244,225,.7);
+  color:var(--ink);font:500 15px var(--sans);cursor:pointer;transition:border-color .25s,background .25s,transform .2s;
 }
-.drop:hover{border-color:var(--accent);background:rgba(233,169,74,.07);transform:translateY(-2px)}
+.drop:hover{border-color:var(--accent);background:#fff8e8;transform:translateY(-2px)}
 .drop svg{width:36px;height:36px;stroke:var(--accent);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.drop small{color:var(--muted);font-weight:400;font-size:13px}
+.drop small{color:var(--ink-soft);font-weight:400;font-size:13px}
 .chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-.chips span{font-size:12px;color:var(--muted);padding:6px 11px;border:1px solid var(--line);border-radius:999px}
+.chips span{font-size:12px;color:var(--ink-soft);padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(251,244,225,.6)}
 
 /* ---------- Floating dock ---------- */
 nav#tools{
   position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);
   width:min(96vw,740px);display:flex;gap:2px;padding:7px;overflow-x:auto;scrollbar-width:none;
-  background:rgba(42,30,18,.84);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(251,244,225,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border:1px solid var(--line);border-radius:24px;
-  box-shadow:0 22px 50px -12px rgba(0,0,0,.7);z-index:6;
+  box-shadow:0 18px 40px -14px rgba(60,40,15,.45);z-index:6;
 }
 nav#tools::-webkit-scrollbar{display:none}
 nav#tools button{
   flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:58px;
-  padding:9px 6px 8px;border:0;border-radius:16px;background:none;color:var(--muted);
+  padding:9px 6px 8px;border:0;border-radius:16px;background:none;color:var(--ink-soft);
   font:500 10.5px var(--sans);letter-spacing:.01em;cursor:pointer;transition:color .2s,background .2s,transform .15s,box-shadow .2s;
 }
 nav#tools button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-nav#tools button:hover{color:var(--text);background:rgba(255,226,180,.05)}
+nav#tools button:hover{color:var(--ink);background:rgba(74,50,22,.06)}
 nav#tools button:active{transform:scale(.92)}
-nav#tools button.on{background:var(--accent);color:#1E140A;box-shadow:0 10px 24px -10px var(--glow)}
+nav#tools button.on{background:var(--accent);color:var(--paper-hi);box-shadow:0 10px 22px -10px var(--glow)}
 
 /* ---------- Hint pill ---------- */
 #hint{
   position:fixed;left:50%;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 84px);transform:translateX(-50%);
-  padding:7px 14px;border-radius:999px;background:rgba(30,20,10,.88);border:1px solid var(--line);
-  font-size:12.5px;color:var(--muted);white-space:nowrap;pointer-events:none;
+  padding:7px 14px;border-radius:999px;background:rgba(251,244,225,.95);border:1px solid var(--line);
+  font-size:12.5px;color:var(--ink-soft);white-space:nowrap;pointer-events:none;
   transition:opacity .3s;z-index:6;max-width:92vw;overflow:hidden;text-overflow:ellipsis;
 }
 body:not(.has-pdf) #hint{opacity:0}
 
 /* ---------- Dialog ---------- */
 dialog{
-  border:1px solid var(--line);border-radius:22px;background:var(--surface);color:var(--text);
-  padding:22px;width:min(94vw,440px);box-shadow:0 40px 90px -20px #000;
+  border:1px solid var(--line);border-radius:22px;background:var(--paper-hi);color:var(--ink);
+  padding:22px;width:min(94vw,440px);box-shadow:0 30px 70px -20px rgba(40,25,8,.6);
 }
-dialog::backdrop{background:rgba(10,6,2,.62);backdrop-filter:blur(4px)}
+dialog::backdrop{background:rgba(43,29,14,.45);backdrop-filter:blur(3px)}
 dialog h3{font-family:var(--serif);font-weight:400;font-size:24px;margin:0 0 4px}
-dialog p{color:var(--muted);font-size:13px;margin:0 0 14px}
+dialog p{color:var(--ink-soft);font-size:13px;margin:0 0 14px}
 dialog canvas{
-  width:100%;height:auto;aspect-ratio:600/240;border-radius:14px;background:#fffdf7;
+  width:100%;height:auto;aspect-ratio:600/240;border-radius:12px;background:#fff;
   border:1px solid var(--line);touch-action:none;display:block;cursor:crosshair;
 }
 .dialog-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
