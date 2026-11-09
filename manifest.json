@@ -1,0 +1,11 @@
+{
+  "name": "Perefiller",
+  "short_name": "Perefiller",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1E140A",
+  "theme_color": "#1E140A",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
