@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1E140A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Perefiller">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Perefiller</title>
+<style>
+:root{
+  --bg:#1E140A; --surface:#2A1E12; --surface-2:#362819;
+  --line:rgba(255,226,180,.10); --text:#F6EDDC; --muted:#B5A385;
+  --accent:#E9A94A; --accent-hi:#F6CD84; --glow:rgba(233,169,74,.38);
+  --radius:18px;
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:var(--sans);color:var(--text);
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(233,169,74,.18), transparent 60%),
+    radial-gradient(700px 500px at -10% 110%, rgba(246,205,132,.08), transparent 60%),
+    var(--bg);
+  display:flex;flex-direction:column;height:100dvh;overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- Header ---------- */
+header{
+  display:flex;align-items:center;gap:8px;padding:12px 14px;
+  background:rgba(30,20,10,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);position:relative;z-index:5;
+}
+.brand{font-family:var(--serif);font-style:italic;font-size:21px;letter-spacing:.2px;margin-right:auto;white-space:nowrap}
+.brand span{color:var(--accent)}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);color:var(--text);
+  font:500 13px var(--sans);cursor:pointer;transition:transform .15s,background .2s,box-shadow .2s;
+  white-space:nowrap;
+}
+.btn:hover{background:var(--surface-2)}
+.btn:active{transform:scale(.96)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.btn.primary{background:var(--accent);color:#1E140A;border-color:transparent;box-shadow:0 8px 22px -8px var(--glow)}
+.btn.primary:hover{background:var(--accent-hi)}
+@media (max-width:520px){ .btn .lbl{display:none} .btn{padding:9px 11px} }
+
+/* ---------- Stage ---------- */
+#pages{
+  flex:1;overflow:auto;padding:26px 12px 150px;
+  display:flex;flex-direction:column;align-items:center;gap:24px;
+  -webkit-overflow-scrolling:touch;
+}
+.page{
+  position:relative;border-radius:6px;overflow:hidden;background:#fff;flex:0 0 auto;
+  box-shadow:0 26px 60px -18px rgba(0,0,0,.7),0 0 0 1px rgba(255,226,180,.07);
+  animation:rise .55s cubic-bezier(.2,.7,.2,1) both;
+}
+.page canvas{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.overlay{position:absolute;inset:0;touch-action:pan-y}
+body.drag .overlay{touch-action:none}
+
+/* ---------- Annotations ---------- */
+.annot{position:absolute;transition:box-shadow .2s}
+.annot.sel{outline:2px solid var(--accent);outline-offset:3px;box-shadow:0 0 0 6px rgba(233,169,74,.16);border-radius:3px}
+.annot img,.annot svg{width:100%;height:100%;display:block;pointer-events:none}
+.annot.text,.annot.date{white-space:nowrap;font-family:Helvetica,Arial,sans-serif}
+
+/* ---------- Empty state ---------- */
+.empty{margin:auto;text-align:center;max-width:440px;padding:28px 22px;animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.eyebrow{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.empty h1{font-family:var(--serif);font-weight:400;font-size:46px;line-height:1.02;letter-spacing:-.8px;margin:14px 0 12px}
+.empty h1 em{color:var(--accent);font-style:italic}
+.empty p{color:var(--muted);line-height:1.6;margin:0 0 26px;font-size:15px}
+.drop{
+  display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;padding:36px 20px;
+  border:1.5px dashed rgba(233,169,74,.42);border-radius:var(--radius);
+  background:linear-gradient(180deg,rgba(255,226,180,.05),rgba(255,226,180,.01));
+  color:var(--text);font:500 15px var(--sans);cursor:pointer;transition:border-color .25s,background .25s,transform .2s;
+}
+.drop:hover{border-color:var(--accent);background:rgba(233,169,74,.07);transform:translateY(-2px)}
+.drop svg{width:36px;height:36px;stroke:var(--accent);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.drop small{color:var(--muted);font-weight:400;font-size:13px}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.chips span{font-size:12px;color:var(--muted);padding:6px 11px;border:1px solid var(--line);border-radius:999px}
+
+/* ---------- Floating dock ---------- */
+nav#tools{
+  position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);
+  width:min(96vw,740px);display:flex;gap:2px;padding:7px;overflow-x:auto;scrollbar-width:none;
+  background:rgba(42,30,18,.84);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--line);border-radius:24px;
+  box-shadow:0 22px 50px -12px rgba(0,0,0,.7);z-index:6;
+}
+nav#tools::-webkit-scrollbar{display:none}
+nav#tools button{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:58px;
+  padding:9px 6px 8px;border:0;border-radius:16px;background:none;color:var(--muted);
+  font:500 10.5px var(--sans);letter-spacing:.01em;cursor:pointer;transition:color .2s,background .2s,transform .15s,box-shadow .2s;
+}
+nav#tools button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+nav#tools button:hover{color:var(--text);background:rgba(255,226,180,.05)}
+nav#tools button:active{transform:scale(.92)}
+nav#tools button.on{background:var(--accent);color:#1E140A;box-shadow:0 10px 24px -10px var(--glow)}
+
+/* ---------- Hint pill ---------- */
+#hint{
+  position:fixed;left:50%;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 84px);transform:translateX(-50%);
+  padding:7px 14px;border-radius:999px;background:rgba(30,20,10,.88);border:1px solid var(--line);
+  font-size:12.5px;color:var(--muted);white-space:nowrap;pointer-events:none;
+  transition:opacity .3s;z-index:6;max-width:92vw;overflow:hidden;text-overflow:ellipsis;
+}
+body:not(.has-pdf) #hint{opacity:0}
+
+/* ---------- Dialog ---------- */
+dialog{
+  border:1px solid var(--line);border-radius:22px;background:var(--surface);color:var(--text);
+  padding:22px;width:min(94vw,440px);box-shadow:0 40px 90px -20px #000;
+}
+dialog::backdrop{background:rgba(10,6,2,.62);backdrop-filter:blur(4px)}
+dialog h3{font-family:var(--serif);font-weight:400;font-size:24px;margin:0 0 4px}
+dialog p{color:var(--muted);font-size:13px;margin:0 0 14px}
+dialog canvas{
+  width:100%;height:auto;aspect-ratio:600/240;border-radius:14px;background:#fffdf7;
+  border:1px solid var(--line);touch-action:none;display:block;cursor:crosshair;
+}
+.dialog-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Pere<span>filler</span></div>
+  <button class="btn" id="open">
+    <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    <span class="lbl">Open</span>
+  </button>
+  <button class="btn" id="undo">
+    <svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>
+    <span class="lbl">Undo</span>
+  </button>
+  <button class="btn" id="save">
+    <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+    <span class="lbl">Save</span>
+  </button>
+  <button class="btn primary" id="share">
+    <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+    <span class="lbl">Share</span>
+  </button>
+</header>
+
+<main id="pages">
+  <div class="empty">
+    <div class="eyebrow">Fill · Sign · Share</div>
+    <h1>Make any PDF <em>yours.</em></h1>
+    <p>Add text, check boxes, dates, and your signature right on the page. Everything stays on your device.</p>
+    <button class="drop" id="pick">
+      <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-5 5m5-5l5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+      Choose a PDF
+      <small>Open a file from your phone or computer</small>
+    </button>
+    <div class="chips"><span>Text</span><span>Signature</span><span>Highlight</span><span>Redact</span><span>Draw</span></div>
+  </div>
+</main>
+
+<nav id="tools">
+  <button data-tool="select" data-hint="Tap an item to select it, drag to move it" class="on">
+    <svg viewBox="0 0 24 24"><path d="M5 3l14 7-6 2-2 6z"/></svg>Cursor</button>
+  <button data-tool="text" data-hint="Tap the page where the text should go">
+    <svg viewBox="0 0 24 24"><path d="M4 6V4h16v2M12 4v16M9 20h6"/></svg>Text</button>
+  <button data-tool="check" data-hint="Tap to place a check mark">
+    <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>Check</button>
+  <button data-tool="cross" data-hint="Tap to place a cross">
+    <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>Cross</button>
+  <button data-tool="date" data-hint="Tap to stamp today's date">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Date</button>
+  <button data-tool="sign" data-hint="Tap to place your signature">
+    <svg viewBox="0 0 24 24"><path d="M3 17c3-6 4 2 7-3s3 4 5 0 3 1 6-2"/><path d="M3 21h18"/></svg>Sign</button>
+  <button data-tool="initials" data-hint="Tap to place your initials">
+    <svg viewBox="0 0 24 24"><path d="M5 19l4-12 4 12M7 13h4M15 7v12M15 7h4"/></svg>Initials</button>
+  <button data-tool="highlight" data-hint="Drag over text to highlight it">
+    <svg viewBox="0 0 24 24"><path d="M9 11l-5 5 4 4h4l8-8-4-4z"/><path d="M14 6l4 4"/></svg>Highlight</button>
+  <button data-tool="draw" data-hint="Drag to draw freehand">
+    <svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>Draw</button>
+  <button data-tool="redact" data-hint="Drag over anything to black it out">
+    <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2" fill="currentColor"/></svg>Redact</button>
+  <button data-tool="shape" data-hint="Drag to draw a box">
+    <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/></svg>Box</button>
+  <button data-tool="image" data-hint="Tap to choose an image and place it">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/></svg>Image</button>
+  <button data-tool="erase" data-hint="Tap an item to remove it">
+    <svg viewBox="0 0 24 24"><path d="M7 21h10M5 14l8-8 6 6-6 6H9z"/></svg>Erase</button>
+</nav>
+
+<div id="hint"></div>
+
+<input type="file" id="pdfIn" accept="application/pdf" hidden>
+<input type="file" id="imgIn" accept="image/*" hidden>
+
+<dialog id="pad">
+  <h3 id="padTitle">Draw</h3>
+  <p>Sign with your finger or mouse. You can reuse it later.</p>
+  <canvas id="padC"></canvas>
+  <div class="dialog-actions">
+    <button class="btn" id="padClear">Clear</button>
+    <button class="btn" id="padCancel">Cancel</button>
+    <button class="btn primary" id="padSave">Save</button>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="app.js"></script>
+<script>
+  // Empty-state button opens the file picker.
+  document.getElementById('pick').onclick = () => document.getElementById('pdfIn').click();
+
+  // Show the hint for the active tool.
+  const hint = document.getElementById('hint');
+  const showHint = b => { hint.textContent = b.dataset.hint; };
+  document.querySelectorAll('#tools button').forEach(b => b.addEventListener('click', () => showHint(b)));
+  showHint(document.querySelector('#tools button.on'));
+
+  // Mark the body once a PDF is open, so the hint appears only then.
+  new MutationObserver(() => {
+    document.body.classList.toggle('has-pdf', !!document.querySelector('.page'));
+  }).observe(document.getElementById('pages'), { childList: true });
+</script>
+</body>
+</html>
