@@ -127,8 +127,19 @@ function setField(name, value) {
   });
 }
 
-let resizeTimer;
-addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => S.pdf && renderDoc(), 300); });
+// Re-render only when the width changes (rotation, window resize), never when the
+// phone keyboard opens: the keyboard shrinks the height, and a re-render would
+// destroy the field being typed into.
+let resizeTimer, lastWidth = innerWidth;
+addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (!S.pdf || Math.abs(innerWidth - lastWidth) < 40) return;
+    if (document.activeElement && document.activeElement.classList.contains('fld')) return;
+    lastWidth = innerWidth;
+    renderDoc();
+  }, 300);
+});
 
 function drawAll() {
   S.pages.forEach(p => p.overlay.innerHTML = '');
