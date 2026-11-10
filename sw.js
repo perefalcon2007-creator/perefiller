@@ -1,4 +1,4 @@
-const CACHE = 'pdf-studio-v4';
+const CACHE = 'pdf-studio-v5';
 const SHELL = ['./', './index.html', './app.js', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
